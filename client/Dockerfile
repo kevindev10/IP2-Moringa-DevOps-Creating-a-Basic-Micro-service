@@ -1,35 +1,29 @@
-# -------------------------------
-# Stage 1: Build Stage
-# -------------------------------
-# Use Node 14 (LTS) base image for compatibility with legacy dependencies
-FROM node:14 AS build
 
-# Set working directory inside the container
+
+# First stage: Build
+FROM node:14-alpine AS build
 WORKDIR /usr/src/app
 
-# Copy dependency definitions
+# Copy dependencies files first for efficient caching
 COPY package*.json ./
-
-# Install all dependencies (including devDependencies)
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application code
 COPY . .
+RUN npm run build
 
-# -------------------------------
-# Stage 2: Runtime Stage
-# -------------------------------
-# Use a lightweight Node 14 Alpine image for the final container
-FROM node:14-alpine
-
-# Set working directory for the runtime container
+# Second stage: Runtime
+FROM node:14-alpine AS runtime
 WORKDIR /app
 
-# Copy the built app and dependencies from the build stage
-COPY --from=build /usr/src/app .
+# Copy built files from the first stage
+COPY --from=build /usr/src/app /app
 
-# Expose the port your backend server listens on
-EXPOSE 5000
+# Ensure the app binds to all network interfaces inside the container
+ENV HOST=0.0.0.0
 
-# Define the default command to run your Node.js backend
-CMD ["node", "server.js"]
+# Expose port for serving the app
+EXPOSE 3000
+
+# Use serve to run the built React frontend
+CMD ["npx", "serve", "-s", "build"]
