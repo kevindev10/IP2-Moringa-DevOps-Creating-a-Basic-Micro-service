@@ -6,64 +6,84 @@
 
 #To launch this app without having to clone the entire repository,use the docker-compose.yaml file to run the app
 
-version: "3.8"
+
+
+
+
+
+
+
+
+version: "3.8"  # Use a modern Compose version for full feature support
 
 services:
 
-  #Builds the frontend Docker image and creates the frontend microservice
-  brian-yolo-client:
-    image: brianbwire/brian-yolo-client:v1.0.0
-    build: ./client
-    container_name: brian-yolo-client
-    stdin_open: true
-    tty: true
+  # ----------------------------------------
+  # Frontend Service: React App
+  # ----------------------------------------
+  yolo-client:
+    build: ./client  # Path to the Dockerfile for the React frontend
+    image: kevindev1/yolo-client:v1.0.0  # Tag to push to Docker Hub
+    container_name: yolo-client  # Custom name for easier container management
+    stdin_open: true  # Keeps STDIN open (useful for interactive debugging)
+    tty: true  # Allocates a TTY (useful for logs and terminal access)
+    restart: always  # Automatically restart the container if it crashes
     ports:
-      - "3000:3000"
+      - "3000:3000"  # Maps host port 3000 to container port 3000 (React dev server or static server)
     depends_on: 
-      - brian-yolo-backend
+      - yolo-backend  # Ensures backend starts before frontend
     networks:
-      - app-net
+      - app-net  # Connects to the shared application network
 
-  #Builds the backend Docker image and creates the backend microservice
-  brian-yolo-backend:
-    image: brianbwire/brian-yolo-backend:v1.0.0
-    build: ./backend
-    container_name: brian-yolo-backend
+  # ----------------------------------------
+  # Backend Service: Node.js API
+  # ----------------------------------------
+  yolo-backend:
+    build: ./backend  # Path to the Dockerfile for the Node.js backend
+    image: kevindev1/yolo-backend:v1.0.0  # Tag to push to Docker Hub
+    container_name: yolo-backend
     stdin_open: true
     tty: true
     restart: always
     ports:
-      - "5000:5000"
+      - "5000:5000"  # Maps host port 5000 to container port 5000 (Node.js server)
     depends_on: 
-      - app-ip-mongo
+      - app-ip-mongo  # Ensures MongoDB starts before backend
     networks:
       - app-net
 
-  #Creates the database microservice
+  # ----------------------------------------
+  # Database Service: MongoDB
+  # ----------------------------------------
   app-ip-mongo:
-    image: mongo
+    image: mongo  # Official MongoDB image from Docker Hub
     container_name: app-mongo
+    restart: always
     ports:
-      - "27017:27017"
+      - "27017:27017"  # Exposes MongoDB's default port
     networks:
       - app-net
     volumes:
       - type: volume
-        source: app-mongo-data
-        target: /data/db
+        source: app-mongo-data  # Named volume for persistent data
+        target: /data/db  # Default data directory inside MongoDB container
 
-#Creates the network infrastructure necessary for the containers to communicate with each other
+# ----------------------------------------
+# Network Configuration
+# ----------------------------------------
 networks:
   app-net:
-    name: app-net
-    driver: bridge
-    attachable: true
+    name: app-net  # Explicitly name the network for clarity
+    driver: bridge  # Use the default bridge driver
+    attachable: true  # Allows containers to connect to this network manually
     ipam:
       config:
-        - subnet: 172.20.0.0/16 
-          ip_range: 172.20.0.0/16 
+        - subnet: 172.20.0.0/16  # Optional: define custom subnet
+          ip_range: 172.20.0.0/16  # Optional: control IP allocation range
 
-#Creates a Docker volume that persists all the data stored in the database
+# ----------------------------------------
+# Volume Configuration
+# ----------------------------------------
 volumes:
   app-mongo-data:
-    driver: local
+    driver: local  # Use local volume driver for persistent MongoDB data
