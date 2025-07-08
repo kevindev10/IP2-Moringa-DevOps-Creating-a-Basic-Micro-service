@@ -23,7 +23,7 @@ services:
   # ----------------------------------------
   yolo-client:
     build: ./client  # Path to the Dockerfile for the React frontend
-    image: kevindev1/yolo-client:v1.0.0  # Tag to push to Docker Hub
+    image: kevindev1/yolo-client-redo:v1.0.0  # Tag to push to Docker Hub
     container_name: yolo-client  # Custom name for easier container management
     stdin_open: true  # Keeps STDIN open (useful for interactive debugging)
     tty: true  # Allocates a TTY (useful for logs and terminal access)
@@ -40,7 +40,7 @@ services:
   # ----------------------------------------
   yolo-backend:
     build: ./backend  # Path to the Dockerfile for the Node.js backend
-    image: kevindev1/yolo-backend:v1.0.0  # Tag to push to Docker Hub
+    image: kevindev1/yolo-backend-redo:v1.0.0  # Tag to push to Docker Hub
     container_name: yolo-backend
     stdin_open: true
     tty: true
