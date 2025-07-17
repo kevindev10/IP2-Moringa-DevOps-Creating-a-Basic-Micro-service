@@ -18,14 +18,14 @@ Used in the runtime stage to minimize image size, reduce attack surface, and str
 
 ## 🐳 Dockerfile Directives
 
-| Directive | Purpose |
-|----------|---------|
-| `FROM` | Declares base image for build and runtime stages |
-| `WORKDIR` | Sets container's working directory |
-| `COPY` | Transfers source code and dependencies |
-| `RUN` | Installs packages and builds app |
-| `EXPOSE` | Documents ports used by each service |
-| `CMD` | Launches the service inside the container |
+| Directive   | Purpose                                               |
+|-------------|-------------------------------------------------------|
+| `FROM`      | Declares base image for build and runtime stages      |
+| `WORKDIR`   | Sets container's working directory                    |
+| `COPY`      | Transfers source code and dependencies                |
+| `RUN`       | Installs packages and builds app                      |
+| `EXPOSE`    | Documents ports used by each service                  |
+| `CMD`       | Launches the service inside the container             |
 
 Multi-stage builds are used in both Dockerfiles to separate build logic from runtime logic, reducing final image size and improving maintainability.
 
@@ -38,13 +38,13 @@ A custom bridge network `app-net` allows services to communicate via container n
 - The backend connects to MongoDB using `app-ip-mongo`
 - The frontend communicates with the backend via `yolo-backend`
 
-### Ports:
+### Ports
 
-| Service | Port Mapping |
-|--------|--------------|
-| Frontend | 3000:3000 |
-| Backend | 5000:5000 |
-| MongoDB | 27017:27017 |
+| Service   | Port Mapping   |
+|-----------|---------------|
+| Frontend  | 3000:3000      |
+| Backend   | 5000:5000      |
+| MongoDB   | 27017:27017    |
 
 IPAM settings were configured to control subnet and IP ranges for predictable container addressing.
 
