@@ -1,6 +1,3 @@
-
-
-```markdown
 # IP2 E-commerce Microservice Project
 
 ## 🚀 Overview
@@ -95,5 +92,4 @@ All images are pushed to Docker Hub and versioned for reproducibility.
 
 Kevin  
 [GitHub Profile](https://github.com/kevindev1)
-```
 
