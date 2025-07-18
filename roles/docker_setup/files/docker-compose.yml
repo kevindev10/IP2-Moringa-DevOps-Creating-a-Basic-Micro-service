@@ -1,0 +1,9 @@
+# docker-compose.yml
+# ───────────────────────────────────────────────────────
+# Initial stub file for service orchestration.
+# Add MongoDB, backend, and frontend containers step-by-step.
+# ───────────────────────────────────────────────────────
+
+version: '3.8'
+services:
+  # Placeholder for future services like mongo, backend, frontend
