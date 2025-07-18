@@ -3,7 +3,7 @@
 # This file defines the automation steps executed inside the Vagrant VM
 
 - name: IP3-Automation-Setup     # Task group label (visible in CLI output)
-  hosts: all                     # Target all hosts in the inventory (just your VM for now)
+  hosts: localhost           
   become: true                   # Use privilege escalation (sudo) for tasks requiring root access
 
   roles:
