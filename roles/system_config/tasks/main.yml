@@ -108,6 +108,6 @@
   git:
     repo: "https://github.com/kevindev10/IP2-Moringa-DevOps-Creating-a-Basic-Micro-service.git"
     dest: /home/vagrant/app
-    version: main              # Target branch to clone
+    version: master              # Target branch to clone
     force: yes                 # Overwrite if directory already exists or is dirty
   tags: [repo_setup, clone]
