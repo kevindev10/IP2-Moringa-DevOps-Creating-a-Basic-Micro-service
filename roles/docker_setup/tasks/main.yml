@@ -1,3 +1,42 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # tasks file for roles/docker_setup
+
+---
+# docker_setup/tasks/main.yml
+# ────────────────────────────────────────────────────────────────
+# This role sets up Docker Compose orchestration inside the VM.
+# It copies a pre-defined docker-compose.yml and optionally runs it.
+# Future services (mongo, backend, frontend) will be added to the Compose file.
+# ────────────────────────────────────────────────────────────────
+
+# 📁 STEP 1: Create target directory for Compose YAML (under app folder)
+# - This is where docker-compose.yml will live
+# - Future config files or env vars can be added here as needed
+- name: Ensure Compose configuration directory exists
+  file:
+    path: /home/vagrant/app
+    state: directory
+    mode: '0755'
+  tags: [compose, docker_setup]
+
+# 📦 STEP 2: Copy docker-compose.yml to VM
+# - The file is stored in docker_setup/files/ locally
+# - Gets placed into /home/vagrant/app where Compose runs
+# - Currently may contain just MongoDB or be a stubbed version
+- name: Copy docker-compose.yml to VM target directory
+  copy:
+    src: docker-compose.yml
+    dest: /home/vagrant/app/docker-compose.yml
+    mode: '0644'
+  tags: [compose, docker_setup]
+
+# 🚀 STEP 3: Run Docker Compose up (optional)
+# - Launches all services defined in docker-compose.yml
+# - Detached mode ensures containers keep running in background
+# - Will be meaningful once services like mongo/backend/frontend are added
+- name: Start services using Docker Compose
+  command: docker-compose up -d
+  args:
+    chdir: /home/vagrant/app      # Run from the directory with Compose file
+  tags: [compose, docker_setup]
