@@ -1,3 +1,113 @@
-#SPDX-License-Identifier: MIT-0
 ---
-# tasks file for roles/system_config
+# -----------------------------------------------------------------------------
+# SYSTEM CONFIGURATION ROLE: Prep the VM for IP3 Automation
+#
+# This role handles system-level setup inside the Vagrant VM. It ensures the
+# environment is equipped with essential CLI tools, Docker runtime, Docker Compose,
+# and the cloned application codebase from GitHub.
+#
+# Tasks are organized and tagged for modular execution and future-proofing.
+# -----------------------------------------------------------------------------
+
+
+
+# 🔁 STEP 1: Refresh APT cache to ensure latest metadata
+# This task updates the package index so that future installations use the most
+# current versions. It's important before installing any packages via apt.
+- name: Refresh APT cache
+  apt:
+    update_cache: yes
+  tags: [system_setup, apt_update]
+
+# 📦 STEP 2: Install essential system utility packages
+# These packages support basic automation and runtime functions inside the VM.
+# They're also useful for troubleshooting, scripting, and networking visibility.
+- name: Install baseline utility packages
+  apt:
+    name:
+      - git             # Enables cloning GitHub repositories (required for app)
+      - curl            # Lets Ansible modules and scripts make HTTP requests
+      - gnupg           # Manages keys for secure APT repository handling
+      - unzip           # Unpacks compressed files (e.g., ZIP archives)
+      - htop            # Interactive process viewer for monitoring system load
+      - net-tools       # Provides tools like netstat and ifconfig for diagnostics
+      - python3         # Python interpreter required by Ansible and cloud SDKs
+      - python3-pip     # Package manager for Python; installs SDKs, CLI tools
+    state: present
+  tags: [system_setup, utilities]
+
+# 🐳 STEP 3: Install Docker CE (Community Edition)
+# Installs the Docker engine needed to run and manage containers inside the VM.
+# This version is from Ubuntu’s default package repositories.
+- name: Install Docker engine
+  apt:
+    name: docker.io
+    state: present
+  tags: [docker_setup, docker]
+
+# 🔐 STEP 4: Add the 'vagrant' user to the Docker group
+# This removes the need to use `sudo` when running Docker commands from the vagrant account.
+# Without this step, many container tasks would fail due to permission issues.
+- name: Add 'vagrant' user to Docker group
+  user:
+    name: vagrant
+    groups: docker
+    append: yes
+  tags: [docker_setup, docker]
+
+# 🚀 STEP 5: Enable Docker to start on VM boot
+# Ensures Docker starts automatically after the VM reboots, maintaining service availability.
+- name: Enable Docker service at startup
+  systemd:
+    name: docker
+    enabled: yes
+  tags: [docker_setup, docker]
+
+# 🔄 STEP 6: Restart Docker to apply user group permissions
+# This ensures group changes take effect immediately, avoiding log-out/log-in cycles.
+- name: Restart Docker service to apply changes
+  systemd:
+    name: docker
+    state: restarted
+  tags: [docker_setup, docker]
+
+# ⚙️ STEP 7: Install Docker Compose
+# Downloads the latest stable Docker Compose v2 binary from GitHub.
+# Docker Compose allows you to define and run multi-container apps using YAML.
+- name: Install Docker Compose (v2.24.0)
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-linux-x86_64"
+    dest: "/usr/local/bin/docker-compose"
+    mode: "0755"                # Make it executable system-wide
+  tags: [docker_setup, compose]
+
+# 🔍 STEP 8: Validate Docker Compose installation
+# Runs a non-failing command to verify installation. Output captured for logs.
+# The task is set to never report "changed" and won’t halt playbook if it fails.
+- name: Check Docker Compose version (non-blocking)
+  command: docker-compose --version
+  register: compose_version
+  changed_when: false
+  ignore_errors: true
+  tags: [docker_setup, compose]
+
+# 🧬 STEP 9: Create destination folder for cloned app
+# This ensures the repo will be cloned into a proper location with set permissions.
+# The directory will be used in future roles for building containers.
+- name: Create application directory
+  file:
+    path: /home/vagrant/app     # Location where the Git repo will be cloned
+    state: directory
+    mode: '0755'                # Standard permissions (rwx for owner, rx for others)
+  tags: [repo_setup, clone]
+
+# 📂 STEP 10: Clone your GitHub repository into the VM
+# Pulls the latest version of your IP2 codebase from GitHub and prepares it for use
+# in container builds handled by future roles (mongo, backend, frontend).
+- name: Clone IP2 GitHub repository into VM
+  git:
+    repo: "https://github.com/kevindev10/IP2-Moringa-DevOps-Creating-a-Basic-Micro-service.git"
+    dest: /home/vagrant/app
+    version: main              # Target branch to clone
+    force: yes                 # Overwrite if directory already exists or is dirty
+  tags: [repo_setup, clone]
