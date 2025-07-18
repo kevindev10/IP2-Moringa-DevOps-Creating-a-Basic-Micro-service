@@ -1,0 +1,37 @@
+# hosts
+# ─────────────────────────────────────────────────────────────────────────────
+# This is a NON-FUNCTIONAL inventory placeholder for planning infrastructure.
+# It does not connect to any hosts and is not intended for active playbook runs.
+# 
+# Use this file as a reference to organize groups or document future targets.
+# Populate it only when infrastructure is ready.
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+# 🖥️ Default Vagrant VM (Example only – not active)
+# [default]
+# default ansible_host=127.0.0.1
+# ansible_port=2222
+# ansible_user=vagrant
+# ansible_private_key_file=.vagrant/machines/default/virtualbox/private_key
+# ansible_connection=ssh
+
+
+# 🧪 Development Environment – Placeholder
+# [dev]
+# dev-node-1 ansible_host=192.168.10.11 ansible_user=ubuntu
+# dev-db-1   ansible_host=192.168.10.12 ansible_user=ubuntu
+
+# 🚀 Production Environment – Placeholder
+# [prod]
+# prod-node-1 ansible_host=10.0.0.11 ansible_user=ubuntu
+# prod-db-1   ansible_host=10.0.0.12 ansible_user=ubuntu
+
+# 🗃️ Groupings – Optional service-level targeting
+# [web]
+# dev-node-1
+# prod-node-1
+
+# [db]
+# dev-db-1
+# prod-db-1
