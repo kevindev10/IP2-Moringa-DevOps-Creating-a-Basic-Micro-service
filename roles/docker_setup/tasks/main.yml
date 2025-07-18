@@ -2,7 +2,7 @@
 ---
 # tasks file for roles/docker_setup
 
----
+
 # docker_setup/tasks/main.yml
 # ────────────────────────────────────────────────────────────────
 # This role sets up Docker Compose orchestration inside the VM.
