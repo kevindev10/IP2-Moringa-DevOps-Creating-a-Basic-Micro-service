@@ -1,0 +1,14 @@
+---
+# Master playbook for IP3 Project
+# This file defines the automation steps executed inside the Vagrant VM
+
+- name: IP3-Automation-Setup     # Task group label (visible in CLI output)
+  hosts: all                     # Target all hosts in the inventory (just your VM for now)
+  become: true                   # Use privilege escalation (sudo) for tasks requiring root access
+
+  roles:
+    - system_config              # ⬅️ Prepares system environment & clones repo from GitHub
+    - docker_setup               # ⬅️ Installs & configures Docker inside the Vagrant VM
+    - mongo_setup                # ⬅️ Pulls MongoDB image, sets up volume & exposes port 27017
+    - backend_setup              # ⬅️ Builds & runs Node.js container on port 5000
+    - frontend_setup             # ⬅️ Builds & runs React container on port 3000
