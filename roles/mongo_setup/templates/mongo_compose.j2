@@ -1,0 +1,23 @@
+# ─────────────────────────────────────────────
+# docker-compose.yml for MongoDB service
+# Generated via Jinja2 template in mongo_setup role
+# ─────────────────────────────────────────────
+
+version: '3.8'  # Compose file version compatible with Docker Compose v2+
+
+services:
+  mongo:
+    image: mongo:latest  # Pulls the official MongoDB image from Docker Hub
+    
+    ports:
+      - "27017:27017"  # Maps container's default MongoDB port to the host
+    
+    volumes:
+      - ./mongo_data:/data/db
+      # Mounts the local directory (mongo_data) as the database path inside the container
+      # MongoDB stores persistent data in /data/db
+      # Ensures that data isn't lost when the container is restarted or destroyed
+
+    restart: always
+    # Automatically restarts the container if it crashes, or if the VM reboots
+    # Helps with durability in real-world environments
