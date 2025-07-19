@@ -1,0 +1,33 @@
+---
+# ─────────────────────────────────────────────────────
+# Role: mongo_setup
+# Purpose: Set up MongoDB container inside Vagrant VM
+# via Docker Compose with persistent storage
+# ─────────────────────────────────────────────────────
+
+- name: Create MongoDB data volume directory
+  file:
+    path: /home/vagrant/app/mongo_data       # Local directory to persist MongoDB data
+    state: directory                          # Create if it doesn't exist
+    mode: '0755'                              # Permissions: owner rwx, others rx
+    owner: vagrant                            # Ownership set to Vagrant user
+    group: vagrant                            # Group ownership for consistency
+
+- name: Replace Compose config with version containing Mongo
+  template:
+    src: mongo_compose.j2                     # Jinja2 template defining the Mongo service
+    dest: /home/vagrant/app/docker-compose.yml  # Overwrites the Compose file in app root
+  notify: Restart Compose stack               # Triggers Docker Compose reload if file changes
+
+- name: Check if Mongo container is running
+  shell: |
+    docker ps --filter "name=mongo" --format "{{.Names}}: {{.Status}}"
+  register: mongo_status                      # Captures CLI output in a variable
+  changed_when: false                         # Mark this as non-changing; it's just a diagnostic
+  # ▶️ This command filters running containers for one named 'mongo'
+  # ▶️ Formats output like: "mongo: Up 10 seconds" or "mongo: Exited (0) 5 minutes ago"
+  # ▶️ Helps confirm Mongo was launched and is healthy
+
+- name: Display Mongo container status
+  debug:
+    var: mongo_status.stdout                  # Prints status string captured above
