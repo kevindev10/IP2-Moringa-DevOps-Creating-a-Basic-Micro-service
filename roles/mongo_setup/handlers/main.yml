@@ -1,3 +1,16 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # handlers file for roles/mongo_setup
+---
+# ───────────────────────────────────────────────────────
+# Handlers for mongo_setup role
+# This fires only when the docker-compose.yml file changes
+# ───────────────────────────────────────────────────────
+
+- name: Restart Compose stack
+  shell: docker-compose -f /home/vagrant/app/docker-compose.yml up -d
+  args:
+    chdir: /home/vagrant/app
+  # ▶️ Relaunches Docker Compose in detached mode from updated config
+  # ▶️ Ensures Mongo service starts or reconfigures after template change
+  # ▶️ 'chdir' navigates into the app directory before executing
