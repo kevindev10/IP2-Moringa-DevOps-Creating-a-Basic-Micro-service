@@ -1,3 +1,8 @@
+
+# Ignore global Ansible vars
+group_vars/all.yml
+
+
 .env
 app-mongo-data
 app-mongo-data/
