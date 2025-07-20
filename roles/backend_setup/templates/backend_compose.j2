@@ -20,8 +20,8 @@ services:
       - "5000:5000"                         # Exposes backend API externally on port 5000
     depends_on:
       - mongo                               # Ensures backend starts only after Mongo is available
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/dbname
+     env_file:
+    - ./backend/.env        # ← This reads the injected .env created by Ansible
       # ▶️ Injects MongoDB connection string into backend container
       # ▶️ Replace 'dbname' with actual database name used in backend code
       # ▶️ Backend must be configured to read this from process.env.MONGO_URI
