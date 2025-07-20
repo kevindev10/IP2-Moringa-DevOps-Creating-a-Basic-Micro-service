@@ -1,0 +1,28 @@
+# ────────────────────────────────────────────────────
+# docker-compose.yml: Backend + Mongo Services
+# Rendered via Jinja2 template in backend_setup role
+# ────────────────────────────────────────────────────
+
+version: '3.8'  # Compose file version compatible with Docker Compose v2+
+
+services:
+  mongo:
+    image: mongo:latest                     # Official MongoDB image from Docker Hub
+    ports:
+      - "27017:27017"                       # Exposes MongoDB service to host
+    volumes:
+      - ./mongo_data:/data/db              # Maps local volume to MongoDB internal data directory
+    restart: always                         # Ensures Mongo container auto-restarts if it fails
+
+  backend:
+    build: ./backend                        # Builds the backend Docker image from Dockerfile in ./backend/
+    ports:
+      - "5000:5000"                         # Exposes backend API externally on port 5000
+    depends_on:
+      - mongo                               # Ensures backend starts only after Mongo is available
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/dbname
+      # ▶️ Injects MongoDB connection string into backend container
+      # ▶️ Replace 'dbname' with actual database name used in backend code
+      # ▶️ Backend must be configured to read this from process.env.MONGO_URI
+    restart: always                         # Automatically restarts backend service on failure

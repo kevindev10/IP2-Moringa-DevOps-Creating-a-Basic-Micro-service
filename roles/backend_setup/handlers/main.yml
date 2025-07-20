@@ -1,3 +1,16 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # handlers file for roles/backend_setup
+
+# ───────────────────────────────────────────────────────
+# Handlers file: backend_setup
+# Purpose: Restart Docker Compose stack if config changes
+# ───────────────────────────────────────────────────────
+
+- name: Restart Compose stack
+  shell: docker-compose -f /home/vagrant/app/docker-compose.yml up -d
+  args:
+    chdir: /home/vagrant/app               # Change directory before executing
+  # ▶️ Launches Docker Compose stack using updated config
+  # ▶️ Runs in detached mode so services continue in background
+  # ▶️ Helps ensure container refresh on any change to template

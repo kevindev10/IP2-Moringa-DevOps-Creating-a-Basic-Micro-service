@@ -1,3 +1,57 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # tasks file for roles/backend_setup
+
+# ───────────────────────────────────────────────────────
+# Role: backend_setup
+# Purpose: Build and run the backend service via Docker Compose
+# ───────────────────────────────────────────────────────
+
+- name: Ensure backend directory exists
+  file:
+    path: /home/vagrant/app/backend        # Path to backend source code inside Vagrant VM
+    state: directory                       # Create if missing
+    mode: '0755'                           # Permissions: rwx for owner, rx for others
+    owner: vagrant                         # Match Vagrant user's ownership
+    group: vagrant                         # Ensures group consistency for shared access
+  # ▶️ Ensures your backend codebase is in place before Compose attempts to build
+
+
+
+
+- name: Inject .env file for backend
+  template:
+    src: .env.j2                            # Jinja2 template containing MONGO_URI
+    dest: /home/vagrant/app/backend/.env    # Target path inside VM
+    mode: '0644'
+    owner: vagrant
+    group: vagrant
+  # ▶️ Creates a deploy-time .env file for backend without exposing secrets to Git
+  # ▶️ Backend must load this using dotenv or equivalent at runtime
+
+
+
+
+
+- name: Inject updated Compose file with backend + Mongo services
+  template:
+    src: backend_compose.j2                # Jinja2 template containing both service definitions
+    dest: /home/vagrant/app/docker-compose.yml
+  notify: Restart Compose stack            # Triggers handler to restart stack if file changes
+  # ▶️ Overwrites the existing Compose file with the new template
+  # ▶️ Ensures backend launches alongside Mongo, correctly wired
+
+- name: Check backend container status
+  shell: |
+    docker ps --filter "name=backend" --format "{{.Names}}: {{.Status}}"
+  register: backend_status
+  changed_when: false
+  # ▶️ Runs Docker CLI to inspect container named 'backend'
+  # ▶️ Output will show health and runtime state, e.g. "backend: Up 12 seconds"
+  # ▶️ Not marked as changed since it's a read-only check
+
+- name: Display backend container status
+  debug:
+    var: backend_status.stdout
+  # ▶️ Prints result of container inspection for visibility
+  # ▶️ Helps confirm backend is running and reachable

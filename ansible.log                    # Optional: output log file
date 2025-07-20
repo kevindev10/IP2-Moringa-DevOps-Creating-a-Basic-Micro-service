@@ -175,3 +175,17 @@ The offending line appears to be:
 ---
 ^ here
 
+2025-07-19 13:24:10,267 p=44193 u=kevin n=ansible INFO| PLAY [IP3-Automation-Setup] ************************************************************************************************************************************
+2025-07-19 13:24:10,350 p=44193 u=kevin n=ansible INFO| TASK [Gathering Facts] *****************************************************************************************************************************************
+2025-07-19 13:24:10,476 p=44193 u=kevin n=ansible INFO| fatal: [127.0.0.1]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 2222: Connection refused", "unreachable": true}
+2025-07-19 13:24:10,478 p=44193 u=kevin n=ansible INFO| PLAY RECAP *****************************************************************************************************************************************************
+2025-07-19 13:24:10,479 p=44193 u=kevin n=ansible INFO| 127.0.0.1                  : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+2025-07-19 13:29:22,378 p=47707 u=kevin n=ansible INFO| PLAY [IP3-Automation-Setup] ************************************************************************************************************************************
+2025-07-19 13:29:22,393 p=47707 u=kevin n=ansible INFO| TASK [Gathering Facts] *****************************************************************************************************************************************
+2025-07-19 13:29:26,070 p=47707 u=kevin n=ansible WARNING| [WARNING]: Platform linux on host 127.0.0.1 is using the discovered Python interpreter at /usr/bin/python3.10, but future installation of another Python
+interpreter could change the meaning of that path. See https://docs.ansible.com/ansible-core/2.18/reference_appendices/interpreter_discovery.html for more
+information.
+
+2025-07-19 13:29:26,071 p=47707 u=kevin n=ansible INFO| ok: [127.0.0.1]
+2025-07-19 13:29:26,106 p=47707 u=kevin n=ansible INFO| PLAY RECAP *****************************************************************************************************************************************************
+2025-07-19 13:29:26,106 p=47707 u=kevin n=ansible INFO| 127.0.0.1                  : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
