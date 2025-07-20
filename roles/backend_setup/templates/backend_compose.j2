@@ -1,28 +1,24 @@
-# ────────────────────────────────────────────────────
-# docker-compose.yml: Backend + Mongo Services
-# Rendered via Jinja2 template in backend_setup role
-# ────────────────────────────────────────────────────
+# docker-compose.yml: Backend + Mongo services
+# Generated via Jinja2 template inside backend_setup role
+# Purpose: Spins up backend Node.js service alongside MongoDB for development/testing
 
-version: '3.8'  # Compose file version compatible with Docker Compose v2+
+version: '3.8'  # Specifies Compose file format version compatible with modern Docker engines
 
 services:
   mongo:
-    image: mongo:latest                     # Official MongoDB image from Docker Hub
+    image: mongo:latest        # Pulls the latest official MongoDB image from Docker Hub
     ports:
-      - "27017:27017"                       # Exposes MongoDB service to host
+      - "27018:27017"          # Maps container port 27017 to host port 27018 to avoid collision with local Mongo
     volumes:
-      - ./mongo_data:/data/db              # Maps local volume to MongoDB internal data directory
-    restart: always                         # Ensures Mongo container auto-restarts if it fails
+      - ./mongo_data:/data/db  # Mounts local volume to persist MongoDB data between container restarts
+    restart: always            # Ensures Mongo container restarts automatically if it crashes or host reboots
 
-  backend:
-    build: ./backend                        # Builds the backend Docker image from Dockerfile in ./backend/
+  yolo-backend:
+    build: ./backend           # Builds image from Dockerfile located in ./backend directory
     ports:
-      - "5000:5000"                         # Exposes backend API externally on port 5000
+      - "5000:5000"            # Maps container port 5000 to host port 5000 for API access
+    env_file:
+      - ./backend/.env         # Loads environment variables (like MONGODB_URI) from .env file in backend dir
     depends_on:
-      - mongo                               # Ensures backend starts only after Mongo is available
-     env_file:
-    - ./backend/.env        # ← This reads the injected .env created by Ansible
-      # ▶️ Injects MongoDB connection string into backend container
-      # ▶️ Replace 'dbname' with actual database name used in backend code
-      # ▶️ Backend must be configured to read this from process.env.MONGO_URI
-    restart: always                         # Automatically restarts backend service on failure
+      - mongo                  # Ensures Mongo container starts before backend to avoid connection errors
+    restart: always            # Automatically restarts backend container on failure or system reboot

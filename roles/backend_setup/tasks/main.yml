@@ -1,57 +1,81 @@
-#SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT-0
 ---
-# tasks file for roles/backend_setup
+# tasks file for backend_setup
+# Purpose: Sets up backend service and MongoDB container using Docker Compose
+# Scope: Inject config files and launch services fully automated
 
-# ───────────────────────────────────────────────────────
-# Role: backend_setup
-# Purpose: Build and run the backend service via Docker Compose
-# ───────────────────────────────────────────────────────
-
-- name: Ensure backend directory exists
+# 📁 Ensure /home/vagrant/app directory exists (for Compose and shared volumes)
+- name: Ensure application directory exists
   file:
-    path: /home/vagrant/app/backend        # Path to backend source code inside Vagrant VM
-    state: directory                       # Create if missing
-    mode: '0755'                           # Permissions: rwx for owner, rx for others
-    owner: vagrant                         # Match Vagrant user's ownership
-    group: vagrant                         # Ensures group consistency for shared access
-  # ▶️ Ensures your backend codebase is in place before Compose attempts to build
-
-
-
-
-- name: Inject .env file for backend
-  template:
-    src: .env.j2                            # Jinja2 template containing MONGO_URI
-    dest: /home/vagrant/app/backend/.env    # Target path inside VM
-    mode: '0644'
+    path: /home/vagrant/app
+    state: directory
     owner: vagrant
     group: vagrant
-  # ▶️ Creates a deploy-time .env file for backend without exposing secrets to Git
-  # ▶️ Backend must load this using dotenv or equivalent at runtime
+    mode: '0755'
+  tags: backend_setup
 
+# 📁 Ensure backend-specific subdirectory exists to hold Dockerfile and .env
+- name: Ensure backend subdirectory exists
+  file:
+    path: /home/vagrant/app/backend
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0755'
+  tags: backend_setup
 
-
-
-
-- name: Inject updated Compose file with backend + Mongo services
+# 🔐 Inject .env file into backend folder using template (.env.j2)
+# Contains sensitive environment variables such as MongoDB URI
+- name: Create .env file for backend
   template:
-    src: backend_compose.j2                # Jinja2 template containing both service definitions
+    src: .env.j2
+    dest: /home/vagrant/app/backend/.env
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+  tags: backend_setup
+
+# ⚙️ Inject docker-compose.yml with backend and Mongo services
+# Uses templated config to avoid hardcoding in the playbook
+- name: Inject docker-compose.yml for backend and mongo
+  template:
+    src: backend_compose.j2
     dest: /home/vagrant/app/docker-compose.yml
-  notify: Restart Compose stack            # Triggers handler to restart stack if file changes
-  # ▶️ Overwrites the existing Compose file with the new template
-  # ▶️ Ensures backend launches alongside Mongo, correctly wired
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+  tags: backend_setup
 
-- name: Check backend container status
-  shell: |
-    docker ps --filter "name=backend" --format "{{.Names}}: {{.Status}}"
-  register: backend_status
-  changed_when: false
-  # ▶️ Runs Docker CLI to inspect container named 'backend'
-  # ▶️ Output will show health and runtime state, e.g. "backend: Up 12 seconds"
-  # ▶️ Not marked as changed since it's a read-only check
+# 🐳 Launch containers via Docker Compose in detached mode
+# Executes inside /home/vagrant/app to pick up docker-compose.yml
+- name: Launch backend and Mongo containers
+  shell: docker-compose up -d
+  args:
+    chdir: /home/vagrant/app
+  register: compose_output
+  tags: backend_setup
 
-- name: Display backend container status
+# 🧾 Output logs from container startup process
+# Useful for inspecting build output and image reuse
+- name: Display container startup logs
   debug:
-    var: backend_status.stdout
-  # ▶️ Prints result of container inspection for visibility
-  # ▶️ Helps confirm backend is running and reachable
+    var: compose_output.stdout_lines
+  tags: backend_setup
+
+# 🔍 Probe backend’s live API for /api/products endpoint
+# Confirms Express server launched correctly and responds to requests
+- name: Verify /api/products endpoint is reachable
+  uri:
+    url: http://localhost:5000/api/products
+    method: GET
+    return_content: yes
+    status_code: 200
+  register: products_api_response
+  tags: backend_setup
+
+# 📦 Output actual response from the backend API
+# Should return list of seeded products if Mongo is connected
+- name: Display /api/products response content
+  debug:
+    var: products_api_response.content
+  tags: backend_setup
