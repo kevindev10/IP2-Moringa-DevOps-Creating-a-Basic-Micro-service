@@ -1,3 +1,68 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # tasks file for roles/frontend_setup
+
+# tasks file for frontend_setup
+# Purpose: Deploy frontend React container using Docker Compose
+# Scope: Inject configs, run container, and verify endpoint
+
+- name: Ensure application directory exists
+  file:
+    path: /home/vagrant/app
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0755'
+  tags: frontend_setup
+
+- name: Ensure frontend subdirectory exists
+  file:
+    path: /home/vagrant/app/frontend
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0755'
+  tags: frontend_setup
+
+- name: Create .env file for frontend
+  template:
+    src: .env.j2
+    dest: /home/vagrant/app/frontend/.env
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+  tags: frontend_setup
+
+- name: Inject docker-compose.yml for frontend
+  template:
+    src: frontend_compose.j2
+    dest: /home/vagrant/app/docker-compose-frontend.yml
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+  tags: frontend_setup
+
+- name: Launch frontend container
+  shell: docker-compose -f docker-compose-frontend.yml up -d
+  args:
+    chdir: /home/vagrant/app
+  register: compose_output
+  tags: frontend_setup
+
+- name: Display container startup logs
+  debug:
+    var: compose_output.stdout_lines
+  tags: frontend_setup
+
+- name: Verify frontend is reachable
+  uri:
+    url: http://localhost:3000
+    method: GET
+    status_code: 200
+  register: frontend_status
+  tags: frontend_setup
+
+- name: Show frontend HTML response
+  debug:
+    var: frontend_status.content
+  tags: frontend_setup

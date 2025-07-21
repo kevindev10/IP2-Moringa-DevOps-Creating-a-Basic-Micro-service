@@ -21,7 +21,9 @@
 
 - name: Check if Mongo container is running
   shell: |
+    {% raw %}
     docker ps --filter "name=mongo" --format "{{.Names}}: {{.Status}}"
+    {% endraw %}
   register: mongo_status                      # Captures CLI output in a variable
   changed_when: false                         # Mark this as non-changing; it's just a diagnostic
   # ▶️ This command filters running containers for one named 'mongo'
