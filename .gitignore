@@ -1,4 +1,12 @@
 
+# Ignore all .log files
+*.log
+
+# Specific file with extra comment
+ansible.log                    # Optional: output log file
+
+
+
 # Ignore global Ansible vars
 group_vars/all.yml
 
