@@ -1,0 +1,19 @@
+# ----------------------------------------
+# MongoDB ClusterIP Service Manifest
+# ----------------------------------------
+
+apiVersion: v1                              # Specifies Kubernetes API version for core resources
+kind: Service                               # Creates a logical abstraction over pods
+metadata:
+  name: mongo                               # Service name used by other pods for internal access
+  labels:
+    app: mongo                              # Matches the label in StatefulSet
+
+spec:
+  selector:
+    app: mongo                              # Targets pods with label 'app: mongo'
+  ports:
+    - port: 27017                           # Port exposed on the Service
+      targetPort: 27017                     # Port forwarded to inside the Mongo container
+      protocol: TCP                         # TCP used for MongoDB communication
+  type: ClusterIP                           # Internal-only service (not exposed externally)
