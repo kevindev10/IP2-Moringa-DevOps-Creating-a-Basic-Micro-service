@@ -1,0 +1,19 @@
+# ------------------------------------------
+# Frontend ClusterIP + External Access
+# ------------------------------------------
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend                             # DNS reference: frontend.default.svc.cluster.local
+  labels:
+    app: frontend
+
+spec:
+  selector:
+    app: frontend                            # Targets pods labeled 'app: frontend'
+  ports:
+    - port: 80                               # External port for users (browser default)
+      targetPort: 3000                       # Port inside the container serving the app
+      protocol: TCP
+  type: NodePort                             # Exposes service on node IP:port (or use Ingress later)
