@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: backend                    # Internal name for the container
-          image: kevin/backend:latest     # Your custom Node.js backend image on Docker Hub
+          image: kevindev1/yolo-backend-redo:v1.0.2     # Your custom Node.js backend image on Docker Hub
           ports:
             - containerPort: 3000          # Port the Node.js app listens on
               name: http                   # Named port for health probes or future use
