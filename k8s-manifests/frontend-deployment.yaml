@@ -1,0 +1,43 @@
+# ------------------------------------------
+# Frontend Deployment Manifest (React/SPA)
+# ------------------------------------------
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend                             # Logical name for referencing in services, etc.
+  labels:
+    app: frontend                            # Label used for selection and organization
+
+spec:
+  replicas: 1                                 # Single replica for now; scale later as needed
+  selector:
+    matchLabels:
+      app: frontend                          # Must match pod labels below
+
+  template:
+    metadata:
+      labels:
+        app: frontend                        # Applied to pods created by this Deployment
+    spec:
+      containers:
+        - name: frontend                    # Container name inside the pod
+          image: kevin/frontend:latest      # Your custom frontend image on Docker Hub
+          ports:
+            - containerPort: 3000           # React apps commonly bind here
+              name: http                    # Named for clarity and potential probes
+
+          resources:
+            requests:                        # Minimum resources requested from node
+              cpu: "100m"
+              memory: "256Mi"
+            limits:                          # Max usage allowed for this container
+              cpu: "250m"
+              memory: "512Mi"
+
+          readinessProbe:
+            httpGet:
+              path: /                       # Base route of the frontend (should return HTML)
+              port: 3000                    # Must match container port
+            initialDelaySeconds: 5
+            periodSeconds: 10
