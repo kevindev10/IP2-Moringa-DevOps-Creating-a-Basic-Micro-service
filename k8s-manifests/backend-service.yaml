@@ -13,7 +13,7 @@ spec:
   selector:
     app: backend                            # Targets pods with this specific label
   ports:
-    - port: 3000                            # External port exposed to other services inside cluster
-      targetPort: 3000                      # Port inside the container
+    - port: 5000                            # External port exposed to other services inside cluster
+      targetPort: 5000                      # Port inside the container
       protocol: TCP                         # Communication protocol used
   type: ClusterIP                           # Internal-only service, no external exposure
