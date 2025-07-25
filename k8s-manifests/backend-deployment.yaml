@@ -1,0 +1,47 @@
+# ------------------------------------------
+# Node.js Backend Deployment Manifest
+# ------------------------------------------
+
+apiVersion: apps/v1                         # API version for Kubernetes Deployments
+kind: Deployment                            # Specifies we're deploying stateless app replicas
+metadata:
+  name: backend                             # Deployment name (used for referencing in services)
+  labels:
+    app: backend                            # Labels used for organization and selection
+
+spec:
+  replicas: 1                               # Number of pods to spin up (scale here if needed)
+  selector:
+    matchLabels:
+      app: backend                          # Ensures this Deployment matches pods with this label
+
+  template:
+    metadata:
+      labels:
+        app: backend                        # Label attached to pods created by this deployment
+    spec:
+      containers:
+        - name: backend                    # Internal name for the container
+          image: kevin/backend:latest     # Your custom Node.js backend image on Docker Hub
+          ports:
+            - containerPort: 3000          # Port the Node.js app listens on
+              name: http                   # Named port for health probes or future use
+
+          env:
+            - name: MONGO_URI              # Environment variable used to connect to Mongo
+              value: mongodb://mongo:27017 # Internal DNS to Mongo Service within cluster
+
+          resources:                       # Resource boundaries to avoid overconsumption
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "250m"
+              memory: "512Mi"
+
+          readinessProbe:                  # Probes are critical for zero-downtime upgrades
+            httpGet:
+              path: /api/products          # Your backend's health check endpoint
+              port: 3000                   # Port the health endpoint is exposed on
+            initialDelaySeconds: 5         # Wait time before first probe
+            periodSeconds: 10              # Frequency of probe checks
