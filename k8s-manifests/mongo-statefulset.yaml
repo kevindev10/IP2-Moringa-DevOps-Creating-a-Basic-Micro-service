@@ -1,0 +1,56 @@
+# ----------------------------------------
+# MongoDB StatefulSet Deployment Manifest
+# ----------------------------------------
+
+apiVersion: apps/v1                         # Specifies Kubernetes API version for StatefulSets
+kind: StatefulSet                           # StatefulSet provides stable identity and storage
+metadata:
+  name: mongo                               # Name of the StatefulSet
+  labels:
+    app: mongo                              # Labels help organize and select resources
+
+spec:
+  serviceName: "mongo"                      # Refers to a headless service that governs pod DNS
+  replicas: 1                               # Number of MongoDB pod replicas (1 for single-node demo)
+  selector:
+    matchLabels:
+      app: mongo                            # Ensures StatefulSet targets pods with this label
+
+  template:
+    metadata:
+      labels:
+        app: mongo                          # Label applied to created pods
+    spec:
+      containers:
+        - name: mongo                       # Name of the container inside the pod
+          image: mongo:latest              # Uses official MongoDB image from Docker Hub
+          ports:
+            - containerPort: 27017         # MongoDB listens on port 27017
+              name: mongo                  # Named port for easier reference in probes
+
+          volumeMounts:
+            - name: mongo-data             # Volume name matches the PVC declared below
+              mountPath: /data/db          # Default data directory for MongoDB
+
+          resources:
+            requests:                      # Minimum guaranteed resources
+              memory: "256Mi"
+              cpu: "100m"
+            limits:                        # Max resources allowed
+              memory: "512Mi"
+              cpu: "250m"
+
+          readinessProbe:                  # Probe checks MongoDB is ready for traffic
+            tcpSocket:
+              port: 27017                  # Simple TCP ping to verify connection
+            initialDelaySeconds: 5         # Delay before first probe
+            periodSeconds: 10              # Time between probes
+
+  volumeClaimTemplates:                    # Define persistent volumes for each pod
+    - metadata:
+        name: mongo-data                   # Must match volumeMounts above
+      spec:
+        accessModes: ["ReadWriteOnce"]     # Allows one pod at a time to mount the volume
+        resources:
+          requests:
+            storage: 1Gi                   # Storage size for MongoDB data
