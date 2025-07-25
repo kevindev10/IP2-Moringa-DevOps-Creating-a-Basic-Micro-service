@@ -1,0 +1,19 @@
+# ------------------------------------------
+# Node.js Backend ClusterIP Service
+# ------------------------------------------
+
+apiVersion: v1                              # Core Kubernetes API version
+kind: Service                               # Creates a stable internal access point to pods
+metadata:
+  name: backend                             # Service name used by frontend or other services
+  labels:
+    app: backend                            # Must match pod labels
+
+spec:
+  selector:
+    app: backend                            # Targets pods with this specific label
+  ports:
+    - port: 3000                            # External port exposed to other services inside cluster
+      targetPort: 3000                      # Port inside the container
+      protocol: TCP                         # Communication protocol used
+  type: ClusterIP                           # Internal-only service, no external exposure

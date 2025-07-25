@@ -42,6 +42,6 @@ spec:
           readinessProbe:                  # Probes are critical for zero-downtime upgrades
             httpGet:
               path: /api/products          # Your backend's health check endpoint
-              port: 3000                   # Port the health endpoint is exposed on
+              port: 5000                   # Port the health endpoint is exposed on
             initialDelaySeconds: 5         # Wait time before first probe
             periodSeconds: 10              # Frequency of probe checks
