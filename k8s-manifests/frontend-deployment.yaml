@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: frontend                    # Container name inside the pod
-          image: kevindev1/yolo-client-redo:v1.0.2     # Your custom frontend image on Docker Hub
+          image: client_image:latest     # Your custom frontend image on Docker Hub
           ports:
             - containerPort: 3000           # React apps commonly bind here
               name: http                    # Named for clarity and potential probes
