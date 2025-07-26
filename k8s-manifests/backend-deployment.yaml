@@ -17,12 +17,15 @@ spec:
 
   template:
     metadata:
+      annotations:
+        date-updated: "2025-07-25T14:42:00"
       labels:
         app: backend                        # Label attached to pods created by this deployment
     spec:
       containers:
         - name: backend                    # Internal name for the container
           image: backend_image:latest    # Your custom Node.js backend image on Docker Hub
+          imagePullPolicy: Never
           ports:
             - containerPort: 3000          # Port the Node.js app listens on
               name: http                   # Named port for health probes or future use

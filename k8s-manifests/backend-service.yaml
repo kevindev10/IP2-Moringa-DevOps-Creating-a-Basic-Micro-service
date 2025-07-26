@@ -10,10 +10,11 @@ metadata:
     app: backend                            # Must match pod labels
 
 spec:
+  type: NodePort
   selector:
     app: backend                            # Targets pods with this specific label
   ports:
     - port: 5000                            # External port exposed to other services inside cluster
       targetPort: 5000                      # Port inside the container
       protocol: TCP                         # Communication protocol used
-  type: ClusterIP                           # Internal-only service, no external exposure
+      nodePort: 30007                           # Internal-only service, no external exposure

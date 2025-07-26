@@ -16,6 +16,8 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+
+
 # -------------------------------
 # Stage 2: Runtime Stage
 # -------------------------------
