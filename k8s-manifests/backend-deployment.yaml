@@ -10,7 +10,7 @@ metadata:
     app: backend                            # Labels used for organization and selection
 
 spec:
-  replicas: 1                               # Number of pods to spin up (scale here if needed)
+  replicas: 3                               # Number of pods to spin up (scale here if needed)
   selector:
     matchLabels:
       app: backend                          # Ensures this Deployment matches pods with this label
@@ -24,10 +24,10 @@ spec:
     spec:
       containers:
         - name: backend                    # Internal name for the container
-          image: backend_image:latest    # Your custom Node.js backend image on Docker Hub
-          imagePullPolicy: Never
+          image: kevindev1/backend:latest   # Your custom Node.js backend image on Docker Hub
+          imagePullPolicy: Always
           ports:
-            - containerPort: 3000          # Port the Node.js app listens on
+            - containerPort: 5000          # Port the Node.js app listens on
               name: http                   # Named port for health probes or future use
 
           env:

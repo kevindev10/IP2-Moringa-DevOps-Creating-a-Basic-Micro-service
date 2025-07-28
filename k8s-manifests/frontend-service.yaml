@@ -16,4 +16,4 @@ spec:
     - port: 80                               # External port for users (browser default)
       targetPort: 3000                       # Port inside the container serving the app
       protocol: TCP
-  type: NodePort                             # Exposes service on node IP:port (or use Ingress later)
+  type: LoadBalancer                             # Exposes service on node IP:port (or use Ingress later)

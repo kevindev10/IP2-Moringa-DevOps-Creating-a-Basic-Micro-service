@@ -10,7 +10,7 @@ metadata:
     app: frontend                            # Label used for selection and organization
 
 spec:
-  replicas: 1                                 # Single replica for now; scale later as needed
+  replicas: 3                                 # Single replica for now; scale later as needed
   selector:
     matchLabels:
       app: frontend                          # Must match pod labels below
@@ -22,8 +22,8 @@ spec:
     spec:
       containers:
         - name: frontend                    # Container name inside the pod
-          image: client_image:latest     # Your custom frontend image on Docker Hub
-          imagePullPolicy: Never
+          image: kevindev1/frontend:latest   # Your custom frontend image on Docker Hub
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000           # React apps commonly bind here
               name: http                    # Named for clarity and potential probes

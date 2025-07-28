@@ -10,6 +10,11 @@ RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application code
 COPY . .
+# Set environment variables for React build
+# Accept API URL as a build arg
+ARG REACT_APP_API_URL
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
 RUN npm run build
 
 # Second stage: Runtime
